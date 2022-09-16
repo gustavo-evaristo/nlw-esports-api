@@ -65,24 +65,31 @@ routes.get('/ads/:id/discord', async (req, res) => {
 
 routes.post('/games/:gameId/ads', async (req, res) => {
 
-	const { gameId }= req.params;
+	try {
+		const { gameId }= req.params;
+	
+		const { name, yearsPlaying, discord, weekDays, hourStart, hourEnd, useVoiceChannel } = req.body;
+	
+		const ads = await ad.create({
+			data: {
+				name,
+				gameId,
+				yearsPlaying,
+				discord, 
+				weekDays: weekDays.join(','),  
+				hourStart: convertHourStringToMinutes(hourStart),
+				hourEnd: convertHourStringToMinutes(hourEnd),
+				useVoiceChannel
+			}
+		});
+	
+		return res.status(200).json(ads);
 
-	const { name, yearsPlaying, discord, weekDays, hourStart, hourEnd, useVoiceChannel } = req.body;
+	} catch (err) {
+		console.log({ err });
+		return res.status(400).json({ err });
+	}
 
-	const ads = await ad.create({
-		data: {
-			name,
-			gameId,
-			yearsPlaying,
-			discord, 
-			weekDays: weekDays.join(','),  
-			hourStart: convertHourStringToMinutes(hourStart),
-			hourEnd: convertHourStringToMinutes(hourEnd),
-			useVoiceChannel
-		}
-	});
-
-	return res.status(200).json(ads);
 });
 
 export { routes };
